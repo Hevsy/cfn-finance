@@ -1,2 +1,2 @@
 # cfn-finance
-Cloudformation tempaltes for Finance
+Cloudformation templates for Finance
