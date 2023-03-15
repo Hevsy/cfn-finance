@@ -5,8 +5,9 @@ Cloudformation templates for Finance
 Done:
   - All networking (VPC, Subnets, IGW, Route tables, Security Groups)
   - DB Subnet Group
-  - PostreSQL RDS
+  - PostgreSQL RDS
   
 TODO:
+  - Key-pair
   - Autoscaling group
   - ALB
