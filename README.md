@@ -1,5 +1,5 @@
 # cfn-finance
-This is a Cloudformation templates for infrastructure required to run Finance web application.
+This is a Cloudformation template for the infrastructure required to run Finance web application.
 For the application's code refer to [Finance repostiory](https://github.com/Hevsy/finance)
 
 The template deploys the following AWS resources:
