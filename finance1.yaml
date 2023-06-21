@@ -252,68 +252,82 @@ Resources:
         - Key: Name
           Value: finance_db
     DeletionPolicy: Retain
-    
-      # AutoMinorVersionUpgrade: false
-      # AvailabilityZone: "String"
-      # BackupRetentionPeriod: Number
-      # CACertificateIdentifier: "String"
-      # CertificateDetails:
-      #   CAIdentifier: "String"
-      #   ValidTill: "String"
-      # CertificateRotationRestart: String
-      # CharacterSetName: "String"
-      # CopyTagsToSnapshot: false
-      # CustomIAMInstanceProfile: "String"
-      # DBClusterIdentifier: "String"
-      # DBClusterSnapshotIdentifier: "String"
 
 
-      # DBParameterGroupName: "String"
-      # DBSnapshotIdentifier: "String"
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: FinanceALB
+      Scheme: internet-facing
+      Subnets:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      SecurityGroups:
+        - !Ref WebSG
+      Tags:
+        - Key: Name
+          Value: FinanceALB
 
-      # DeleteAutomatedBackups: false
-      # DeletionProtection: false
-      # Domain: "String"
-      # DomainIAMRoleName: "String"
-      # EnableCloudwatchLogsExports:
-      #   EnableCloudwatchLogsExports
-      # EnableIAMDatabaseAuthentication: false
-      # EnablePerformanceInsights: false
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: FinanceTargetGroup
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref FinanceVPC
+      TargetType: instance
+      Tags:
+        - Key: Name
+          Value: FinanceTargetGroup
 
-      # EngineVersion: "String"
-      # Iops: Number
-      # KmsKeyId: "String"
-      # LicenseModel: "String"
-      # ManageMasterUserPassword: false
-      # MasterUserSecret:
-      #   KmsKeyId: "String"
-      #   SecretArn: "String"
-      # MaxAllocatedStorage: Number
-      # MonitoringInterval: Number
-      # MonitoringRoleArn: "String"
-      # MultiAZ: false
-      # NcharCharacterSetName: "String"
-      # NetworkType: "String"
-      # OptionGroupName: "String"
-      # PerformanceInsightsKMSKeyId: "String"
-      # PerformanceInsightsRetentionPeriod: Number
-      # Port: "String"
-      # PreferredBackupWindow: "String"
-      # PreferredMaintenanceWindow: "String"
-      # ProcessorFeatures:
-      #   ProcessorFeatures
-      # PromotionTier: Number
-      # PubliclyAccessible: false
-      # ReplicaMode: "String"
-      # RestoreTime: "String"
-      # SourceDBInstanceAutomatedBackupsArn: "String"
-      # SourceDBInstanceIdentifier: "String"
-      # SourceDbiResourceId: "String"
-      # SourceRegion: "String"
-      # StorageEncrypted: false
-      # StorageThroughput: Number
-      # StorageType: "String"
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
 
-      # Timezone: "String"
-      # UseDefaultProcessorFeatures: false
-      # UseLatestRestorableTime: false
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: FinanceASG
+      LaunchConfigurationName: FinanceLaunchConfiguration
+      MinSize: 2
+      MaxSize: 4
+      DesiredCapacity: 2
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      TargetGroupARNs:
+        - !Ref TargetGroup
+      Tags:
+        - Key: Name
+          Value: FinanceASG
+          PropagateAtLaunch: true
+      HealthCheckGracePeriod: 300
+
+  LaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      LaunchConfigurationName: FinanceLaunchConfiguration
+      ImageId: !Ref ImageId
+      InstanceType: t2.micro
+      KeyName: !Ref KeyName
+      SecurityGroups:
+        - !Ref WebSG
+        - !Ref SSHSG
+        - !Ref EC2toRDSSG
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          echo "Hello, World!" > /var/www/html/index.html
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 10
+            VolumeType: gp2
+            DeleteOnTermination: true
+      AssociatePublicIpAddress: true
