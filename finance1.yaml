@@ -48,7 +48,27 @@ Resources:
       Tags:
         - Key: Name
           Value: PrivateSubnet2
+          
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [0, !GetAZs ]
+      VpcId: !Ref FinanceVPC
+      CidrBlock: 10.0.3.0/24
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet3
 
+  PrivateSubnet4:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [1, !GetAZs ]
+      VpcId: !Ref FinanceVPC
+      CidrBlock: 10.0.4.0/24
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet4
+          
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -295,12 +315,12 @@ Resources:
     Properties:
       AutoScalingGroupName: FinanceASG
       LaunchConfigurationName: FinanceLaunchConfiguration
-      MinSize: 2
-      MaxSize: 4
-      DesiredCapacity: 2
+      MinSize: 1
+      MaxSize: 2
+      DesiredCapacity: 1
       VPCZoneIdentifier:
-        - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+        - !Ref PrivateSubnet4
       TargetGroupARNs:
         - !Ref TargetGroup
       Tags:
@@ -327,7 +347,7 @@ Resources:
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
-            VolumeSize: 10
+            VolumeSize: 8
             VolumeType: gp2
             DeleteOnTermination: true
       AssociatePublicIpAddress: true
