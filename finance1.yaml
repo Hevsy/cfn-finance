@@ -267,14 +267,14 @@ Resources:
       DBInstanceClass: db.t4g.micro
       DBInstanceIdentifier: db-finance1
       MasterUsername: postgres
-      MasterUserPassword: {{resolve:ssm-secure:/finance/db_pwd}}
+      MasterUserPassword: postgres
       Tags:
         - Key: Name
           Value: finance_db
     DeletionPolicy: Retain
 
 
-  LoadBalancer:
+  FinanceALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: FinanceALB
@@ -288,7 +288,7 @@ Resources:
         - Key: Name
           Value: FinanceALB
 
-  TargetGroup:
+  FinanceTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: FinanceTargetGroup
@@ -303,14 +303,14 @@ Resources:
   Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
-      LoadBalancerArn: !Ref LoadBalancer
+      LoadBalancerArn: !Ref FinanceALB
       Port: 80
       Protocol: HTTP
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref TargetGroup
+          TargetGroupArn: !Ref FinanceTargetGroup
 
-  AutoScalingGroup:
+  FinanceASG:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: FinanceASG
@@ -322,14 +322,14 @@ Resources:
         - !Ref PrivateSubnet3
         - !Ref PrivateSubnet4
       TargetGroupARNs:
-        - !Ref TargetGroup
+        - !Ref FinanceTargetGroup
       Tags:
         - Key: Name
           Value: FinanceASG
           PropagateAtLaunch: true
       HealthCheckGracePeriod: 300
 
-  LaunchConfiguration:
+  FinanceLaunchConfiguration:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
       LaunchConfigurationName: FinanceLaunchConfiguration
