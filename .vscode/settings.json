@@ -1,6 +1,0 @@
-{
-    "yaml.schemas": {
-        "aws:/c%3A/Users/Paul/AppData/Roaming/Code/User/globalStorage/amazonwebservices.aws-toolkit-vscode/sam.schema.json": "file:///c%3A/Users/Paul/code/cfn-finance/finance1.yaml"
-    },
-    "cfnLint.path": "/home/ubuntu/.local/bin/cfn-lint"
-}
