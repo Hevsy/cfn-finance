@@ -267,7 +267,7 @@ Resources:
       DBInstanceClass: db.t4g.micro
       DBInstanceIdentifier: db-finance1
       MasterUsername: postgres
-      MasterUserPassword: postgres
+      MasterUserPassword: '{{resolve:ssm-secure:/finance/db_pwd}}'
       Tags:
         - Key: Name
           Value: finance_db

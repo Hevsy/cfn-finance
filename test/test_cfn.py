@@ -2,11 +2,15 @@ import pytest
 from pathlib import Path
 from cloud_radar.cf.unit import Template
 
+dynamic_references = {"ssm-secure": {"/finance/db_pwd": "password"}}
+
 
 @pytest.fixture
 def template():
     template_path = Path(__file__).parent / "../finance1.yaml"
-    return Template.from_yaml(template_path.resolve())
+    return Template.from_yaml(
+        template_path.resolve(), dynamic_references=dynamic_references
+    )
 
 
 @pytest.fixture
@@ -41,38 +45,20 @@ def test_network_resources(template, params, resource_name):
 
 @pytest.mark.parametrize(
     "resource_name",
-    [
-        "WebSG", 
-        "SSHSG", 
-        "EC2toRDSSG", 
-        "EC2toRDSegress", 
-        "RDStoEC2SG", 
-        "RDStoEC2ingress"],
+    ["WebSG", "SSHSG", "EC2toRDSSG", "EC2toRDSegress", "RDStoEC2SG", "RDStoEC2ingress"],
 )
 def test_security_groups(template, params, resource_name):
     stack = template.render(params)
     assert resource_name in stack["Resources"]
 
 
-@pytest.mark.parametrize(
-        "resource_name", 
-        [
-            "DBSubnetGroup1", 
-            "FinanceDB"
-            ]
-            )
+@pytest.mark.parametrize("resource_name", ["DBSubnetGroup1", "FinanceDB"])
 def test_database_resources(template, params, resource_name):
     stack = template.render(params)
     assert resource_name in stack["Resources"]
 
 
-@pytest.mark.parametrize(
-        "resource_name", 
-        [
-            "FinanceALB", 
-            "FinanceTargetGroup"
-            ]
-            )
+@pytest.mark.parametrize("resource_name", ["FinanceALB", "FinanceTargetGroup"])
 def test_load_balancer_resources(template, params, resource_name):
     stack = template.render(params)
     assert resource_name in stack["Resources"]
