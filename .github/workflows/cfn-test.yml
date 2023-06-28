@@ -26,4 +26,4 @@ jobs:
         pip install cloud-radar pytest
     - name: Test with cloud-radar/pytest
       run: |
-        pytest
+        pytest -v
