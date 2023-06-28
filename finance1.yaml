@@ -8,8 +8,8 @@ Parameters:
   SSHLocation:
     Description: The IP address range that can be used to SSH to the EC2 instances
     Type: String
-    MinLength: '9'
-    MaxLength: '18'
+    MinLength: "9"
+    MaxLength: "18"
     Default: 0.0.0.0/0
     AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
@@ -48,7 +48,7 @@ Resources:
       Tags:
         - Key: Name
           Value: PrivateSubnet2
-          
+
   PrivateSubnet3:
     Type: AWS::EC2::Subnet
     Properties:
@@ -68,7 +68,7 @@ Resources:
       Tags:
         - Key: Name
           Value: PrivateSubnet4
-          
+
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -152,8 +152,8 @@ Resources:
       SubnetId: !Ref PrivateSubnet2
       RouteTableId: !Ref PrivateRT
 
-# EC2
-# Secutity Groups
+  # EC2
+  # Secutity Groups
   WebSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -167,12 +167,12 @@ Resources:
         - IpProtocol: udp
           FromPort: 53
           ToPort: 53
-          CidrIp: 0.0.0.0/0      
+          CidrIp: 0.0.0.0/0
       Tags:
-          - Key: Name
-            Value: Finance-WebServer-SG
+        - Key: Name
+          Value: Finance-WebServer-SG
       VpcId: !Ref FinanceVPC
-    
+
   SSHSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -184,8 +184,8 @@ Resources:
           ToPort: 22
           CidrIp: !Ref SSHLocation
       Tags:
-          - Key: Name
-            Value: Finance-SSH-SG
+        - Key: Name
+          Value: Finance-SSH-SG
       VpcId: !Ref FinanceVPC
 
   EC2toRDSSG:
@@ -194,14 +194,14 @@ Resources:
       GroupDescription: Allow connections to DB from any instances this security group is attached to
       GroupName: EC2-RDS-SG
       Tags:
-          - Key: Name
-            Value: Finance-EC2-RDS-SG
+        - Key: Name
+          Value: Finance-EC2-RDS-SG
       VpcId: !Ref FinanceVPC
 
   EC2toRDSegress:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
-      GroupId: !Ref EC2toRDSSG 
+      GroupId: !Ref EC2toRDSSG
       IpProtocol: tcp
       FromPort: 5432
       ToPort: 5432
@@ -213,19 +213,19 @@ Resources:
       GroupDescription: Allow EC2 instances with specific security groups attached to connect to the database.
       GroupName: RDS-EC2-SG
       Tags:
-          - Key: Name
-            Value: Finance-RDS-EC2-SG
+        - Key: Name
+          Value: Finance-RDS-EC2-SG
       VpcId: !Ref FinanceVPC
 
   RDStoEC2ingress:
     Type: AWS::EC2::SecurityGroupIngress
-    Properties: 
+    Properties:
       GroupId: !Ref RDStoEC2SG
       IpProtocol: tcp
       FromPort: 5432
       ToPort: 5432
       SourceSecurityGroupId: !Ref EC2toRDSSG
-   
+
   FinanceWebServer:
     Type: AWS::EC2::Instance
     Properties:
@@ -241,7 +241,7 @@ Resources:
         - Key: Name
           Value: Finance-WebServer
 
-# RDS
+  # RDS
   DBSubnetGroup1:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -253,26 +253,26 @@ Resources:
       Tags:
         - Key: Name
           Value: db-finance-subnet-group
-        
+
   FinanceDB:
     Type: AWS::RDS::DBInstance
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       AllocatedStorage: 20
       DBName: finance_db
       VPCSecurityGroups:
         - !Ref RDStoEC2SG
       Engine: postgres
-      
+
       DBSubnetGroupName: !Ref DBSubnetGroup1
       DBInstanceClass: db.t4g.micro
       DBInstanceIdentifier: db-finance1
       MasterUsername: postgres
-      MasterUserPassword: '{{resolve:ssm-secure:/finance/db_pwd}}'
+      MasterUserPassword: "{{resolve:ssm-secure:/finance/db_pwd}}"
       Tags:
         - Key: Name
           Value: finance_db
-    DeletionPolicy: Retain
-
 
   FinanceALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
