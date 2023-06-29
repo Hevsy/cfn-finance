@@ -2,11 +2,11 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
   KeyName:
-    Description: Name of an existing EC2 key pair for SSH access to the EC2 instance.
+    Description: Name of an existing EC2 key pair for SSH access to EC2 instances.
     Type: AWS::EC2::KeyPair::KeyName
 
   SSHLocation:
-    Description: The IP address range that can be used to SSH to the EC2 instances
+    Description: The IP address range that can be used to SSH to EC2 instances.
     Type: String
     MinLength: "9"
     MaxLength: "18"
@@ -74,7 +74,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select [0, !GetAZs ]
       VpcId: !Ref FinanceVPC
-      CidrBlock: 10.0.3.0/24
+      CidrBlock: 10.0.11.0/24
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
@@ -85,7 +85,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select [1, !GetAZs ]
       VpcId: !Ref FinanceVPC
-      CidrBlock: 10.0.4.0/24
+      CidrBlock: 10.0.12.0/24
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
