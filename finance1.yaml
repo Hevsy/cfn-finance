@@ -226,20 +226,20 @@ Resources:
       ToPort: 5432
       SourceSecurityGroupId: !Ref EC2toRDSSG
 
-  FinanceWebServer:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !Ref ImageId
-      InstanceType: t2.micro
-      KeyName: !Ref KeyName
-      SecurityGroupIds:
-        - !Ref WebSG
-        - !Ref SSHSG
-        - !Ref EC2toRDSSG
-      SubnetId: !Ref PublicSubnet1
-      Tags:
-        - Key: Name
-          Value: Finance-WebServer
+  #FinanceWebServer:
+  # Type: AWS::EC2::Instance
+  #  Properties:
+  #    ImageId: !Ref ImageId
+  #    InstanceType: t2.micro
+  #    KeyName: !Ref KeyName
+  #    SecurityGroupIds:
+  #      - !Ref WebSG
+  #      - !Ref SSHSG
+  #      - !Ref EC2toRDSSG
+  #    SubnetId: !Ref PublicSubnet1
+  #    Tags:
+  #      - Key: Name
+  #        Value: Finance-WebServer
 
   # RDS
   DBSubnetGroup1:
@@ -256,8 +256,8 @@ Resources:
 
   FinanceDB:
     Type: AWS::RDS::DBInstance
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
+    # DeletionPolicy: Retain
+    # UpdateReplacePolicy: Retain
     Properties:
       AllocatedStorage: 20
       DBName: finance_db
