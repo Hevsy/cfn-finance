@@ -22,7 +22,7 @@ def params():
     "resource_name",
     [
         "FinanceVPC",
-        "FinanceWebServer",
+        # "FinanceWebServer",
         "PrivateSubnet1",
         "PrivateSubnet2",
         "PrivateSubnet3",
